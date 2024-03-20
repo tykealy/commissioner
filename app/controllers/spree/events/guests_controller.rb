@@ -31,6 +31,17 @@ module Spree
         @event = @guest.event
       end
 
+      def resend
+        @event = current_event
+        @guest = SpreeCmCommissioner::Guest.find(params[:id])
+        @orders = @guest.line_item.order
+
+        @orders.deliver_order_confirmation_email
+        flash[:success] = Spree.t(:order_email_resent)
+
+        redirect_back fallback_location: edit_event_guest_url
+      end
+
       private
 
       def csv_name
