@@ -12,17 +12,34 @@ module Spree
       end
 
       def index
-        file_name = Rails.root.join('tmp', csv_name)
-
         respond_with(collection) do |format|
           format.csv do
-            SpreeCmCommissioner::GenerateGuestsCsv.call(
-              collection: collection,
-              file_name: file_name
-            )
+            generate_csv
 
-            send_file file_name
+            if Sidekiq::Status.complete?(@job_status)
+              download_csv
+            else
+              flash[:notice] = 'The CSV file is being generated. Please wait a moment and try again.'
+              redirect_to collection_url
+            end
           end
+        end
+      end
+
+      def generate_csv
+        guest_ids = collection.pluck(:id)
+        @generate_guest_csv_job_id = SpreeCmCommissioner::GenerateGuestsCsvJob.perform_async(guest_ids, csv_file_path)
+        session[:generate_guest_csv_job_id] = @generate_guest_csv_job_id
+        @job_status = Sidekiq::Status.status(@generate_guest_csv_job_id)
+      end
+
+      def download_csv
+        @generate_guest_csv_job_id = session[:generate_guest_csv_job_id]
+        if Sidekiq::Status.complete? @generate_guest_csv_job_id
+          send_file csv_file_path
+        else
+          flash[:alert] = 'The CSV file is in progress. Please wait a moment and try again.'
+          redirect_to collection_url
         end
       end
 
@@ -32,6 +49,10 @@ module Spree
       end
 
       private
+
+      def csv_file_path
+        @csv_file_path ||= Rails.root.join('tmp', csv_name)
+      end
 
       def csv_name
         @csv_name ||= "guests-data-#{current_event.name.downcase.gsub(' ', '-')}-#{Time.current.to_i}.csv"

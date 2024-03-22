@@ -1,6 +1,7 @@
 <% content_for :page_title do %>
   <%= Spree.t(:register_guests) %>
   <%= link_to 'Export CSV', event_guests_path(format: :csv, params: params.permit!), class: 'btn btn-primary float-right' %>
+  <%= link_to 'Download CSV', download_csv_event_guests_path, class: 'btn btn-primary float-right mr-5' %>
 <% end %>
 
 <% content_for :page_tabs do %>
