@@ -26,21 +26,21 @@
       <div class="row no-gutters">
         <div class="col-4">
           <div class="d-flex align-items-center">
-            <%= f.number_field :hours, class: 'form-control', placeholder: 'Hours', value: @object.duration_in_hms[:hours] || 0 %>
+            <%= f.number_field :hours, class: 'form-control', placeholder: 'Hours', value: @object.duration_in_hms[:hours] || 0, min: 0, required: true %>
             <span class="input-group-text" id="">h</span>
           </div>
           <%= f.error_message_on :hours %>
         </div>
         <div class="col-4">
           <div class="d-flex align-items-center">
-            <%= f.number_field :minutes, class: 'form-control', placeholder: 'Minutes', value: @object.duration_in_hms[:minutes] || 0 %>
+            <%= f.number_field :minutes, class: 'form-control', placeholder: 'Minutes', value: @object.duration_in_hms[:minutes] || 0, min: 0, required: true %>
             <span class="input-group-text" id="">m</span>
           </div>
           <%= f.error_message_on :minutes %>
         </div>
         <div class="col-4">
           <div class="d-flex align-items-center">
-            <%= f.number_field :seconds, class: 'form-control', placeholder: 'Seconds', value: @object.duration_in_hms[:seconds] || 0 %>
+            <%= f.number_field :seconds, class: 'form-control', placeholder: 'Seconds', value: @object.duration_in_hms[:seconds] || 0, min: 0, required: true %>
             <span class="input-group-text" id="">s</span>
           </div>
           <%= f.error_message_on :seconds %>
